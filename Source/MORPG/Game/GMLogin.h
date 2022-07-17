@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Game/GMBase.h"
+#include "GMBase.h"
 #include "GMLogin.generated.h"
 
 /**
