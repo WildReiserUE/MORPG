@@ -11,6 +11,7 @@
 APCGame::APCGame()
 {
 	bShowMouseCursor = true;
+	bEnableClickEvents = true;
 	DefaultMouseCursor = EMouseCursor::Default;
 }
 
@@ -25,14 +26,7 @@ void APCGame::PlayerTick(float DeltaTime)
 		// Look for the touch location
 		FVector HitLocation = FVector::ZeroVector;
 		FHitResult Hit;
-		if(bIsTouch)
-		{
-			GetHitResultUnderFinger(ETouchIndex::Touch1, ECC_Visibility, true, Hit);
-		}
-		else
-		{
-			GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-		}
+		GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 		HitLocation = Hit.Location;
 
 		// Direct the Pawn towards that location
@@ -46,6 +40,7 @@ void APCGame::PlayerTick(float DeltaTime)
 	else
 	{
 		FollowTime = 0.f;
+		
 	}
 }
 
@@ -57,9 +52,9 @@ void APCGame::SetupInputComponent()
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &APCGame::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &APCGame::OnSetDestinationReleased);
 
-	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &APCGame::OnTouchPressed);
-	InputComponent->BindTouch(EInputEvent::IE_Released, this, &APCGame::OnTouchReleased);
+	// // support touch devices 
+	// InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &APCGame::OnTouchPressed);
+	// InputComponent->BindTouch(EInputEvent::IE_Released, this, &APCGame::OnTouchReleased);
 
 }
 
@@ -67,8 +62,16 @@ void APCGame::OnSetDestinationPressed()
 {
 	// We flag that the input is being pressed
 	bInputPressed = true;
-	// Just in case the character was moving because of a previous short press we stop it
 	StopMovement();
+	FVector HitLocation = FVector::ZeroVector;
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	HitLocation = Hit.Location;
+
+	// We move there and spawn some particles
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+	
 }
 
 void APCGame::OnSetDestinationReleased()
@@ -76,29 +79,29 @@ void APCGame::OnSetDestinationReleased()
 	// Player is no longer pressing the input
 	bInputPressed = false;
 
-	// If it was a short press
-	if(FollowTime <= ShortPressThreshold)
-	{
-		// We look for the location in the world where the player has pressed the input
-		FVector HitLocation = FVector::ZeroVector;
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-		HitLocation = Hit.Location;
-
-		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
-	}
+// 	// If it was a short press
+	// if(FollowTime <= ShortPressThreshold)
+	// {
+	// 	// We look for the location in the world where the player has pressed the input
+	// 	FVector HitLocation = FVector::ZeroVector;
+	// 	FHitResult Hit;
+	// 	GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	// 	HitLocation = Hit.Location;
+	//
+	// 	// We move there and spawn some particles
+	// 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
+	// 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+	// }
 }
 
-void APCGame::OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	bIsTouch = true;
-	OnSetDestinationPressed();
-}
-
-void APCGame::OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	bIsTouch = false;
-	OnSetDestinationReleased();
-}
+// void APCGame::OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location)
+// {
+// 	bIsTouch = true;
+// 	OnSetDestinationPressed();
+// }
+//
+// void APCGame::OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location)
+// {
+// 	bIsTouch = false;
+// 	OnSetDestinationReleased();
+// }
