@@ -11,6 +11,7 @@
 APCGame::APCGame()
 {
 	bShowMouseCursor = true;
+	bEnableMouseOverEvents = true;
 	bEnableClickEvents = true;
 	DefaultMouseCursor = EMouseCursor::Default;
 }
@@ -79,7 +80,7 @@ void APCGame::OnSetDestinationReleased()
 	// Player is no longer pressing the input
 	bInputPressed = false;
 
-// 	// If it was a short press
+	// If it was a short press
 	// if(FollowTime <= ShortPressThreshold)
 	// {
 	// 	// We look for the location in the world where the player has pressed the input
