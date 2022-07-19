@@ -1,20 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Created WildReiser
 
 
 #include "ItemBase.h"
-
 #include "Kismet/GameplayStatics.h"
 
 
-// Sets default values
 AItemBase::AItemBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	ItemMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
 	ItemMeshComponent->SetGenerateOverlapEvents(true);
 	SetRootComponent(ItemMeshComponent);
-	//ItemMeshComponent->OnClicked.AddUniqueDynamic(this, &ATDSItemBase::RenderOn);
+	ItemWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("ItemWidget"));
+	ItemWidgetComponent->SetupAttachment(ItemMeshComponent);
 }
 
 void AItemBase::SpawnParticleFx(UParticleSystem* NewParticle)
@@ -23,55 +21,57 @@ void AItemBase::SpawnParticleFx(UParticleSystem* NewParticle)
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), NewParticle, GetOwner()->GetActorLocation());
 }
 
-void AItemBase::RenderOn(UPrimitiveComponent* pComponent)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("Item: Switch RenderON"));
-	UE_LOG(LogViewport, Display, TEXT("Command to RENDER ON"));
-	if(pComponent)
-	{
-		pComponent->SetRenderCustomDepth(true);
-	}
-}
-
 void AItemBase::RenderOff(UPrimitiveComponent* pComponent)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("Item: Switch RenderOFF"));
-	UE_LOG(LogViewport, Display, TEXT("Command to RENDER OFF"));
-	if (pComponent)
+{	
+	if (pComponent && !bClicked)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("Item: Switch RenderOFF"));
+		UE_LOG(LogViewport, Display, TEXT("Command to RENDER OFF"));
 		pComponent->SetRenderCustomDepth(false);
 	}
 }
 
-void AItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void AItemBase::RenderLock()
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-	ChangeSettings();
+	if(ItemMeshComponent && !bClicked)
+	{
+		bClicked = true;
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("Item: Switch RenderLOCK"));
+		UE_LOG(LogViewport, Display, TEXT("Command to RENDER LOCK"));
+		ItemMeshComponent->SetRenderCustomDepth(true);		
+	}
 }
+
+void AItemBase::NotifyActorOnClicked(FKey ButtonPressed)
+{
+	Super::NotifyActorOnClicked(ButtonPressed);
+	RenderLock();
+}
+
+// void AItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+// {
+// 	Super::PostEditChangeProperty(PropertyChangedEvent);
+// 	
+// }
 
 void AItemBase::ChangeSettings()
 {
 	if(ItemInfo.ItemMesh)
 	{
 		ItemMeshComponent->SetStaticMesh(ItemInfo.ItemMesh);
-		ItemMeshComponent->OnBeginCursorOver.AddUniqueDynamic(this, &AItemBase::RenderOn);
 		ItemMeshComponent->OnEndCursorOver.AddUniqueDynamic(this, &AItemBase::RenderOff);
+		ItemMeshComponent->OnBeginCursorOver.AddUniqueDynamic(this, &AItemBase::ShowItemName);
 	}
 	else
 		ItemMeshComponent->SetStaticMesh(nullptr);
 }
 
-// Called when the game starts or when spawned
+void AItemBase::ShowItemName(UPrimitiveComponent* pComponent)
+{
+	UE_LOG(LogViewport, Display, TEXT("Command to SHOW WIDGET"));
+}
+
 void AItemBase::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	ChangeSettings();
 }
-
-// Called every frame
-void AItemBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

@@ -1,8 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Created WildReiser
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Actor.h"
 #include "ItemBase.generated.h"
 
@@ -118,6 +119,8 @@ struct FItemInfo
 	int Cost = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int Weight = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UUserWidget* ItemPreviewWidget = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -161,24 +164,33 @@ class MORPG_API AItemBase : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AItemBase();
-	virtual void Tick(float DeltaTime) override;
+	
 	void SpawnParticleFx(UParticleSystem* NewParticle);
-
-	UFUNCTION()
-	void RenderOn(UPrimitiveComponent* pComponent);
 
 	UFUNCTION()
 	void RenderOff(UPrimitiveComponent* pComponent);
 
-#if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	void ChangeSettings();
-#endif
+	UFUNCTION()
+	void RenderLock();
+
+	UFUNCTION()
+	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
+
+// #if WITH_EDITOR
+// 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+// 	
+// #endif
+	
+	void ChangeSettings();	
+	UFUNCTION()
+	void ShowItemName(UPrimitiveComponent* pComponent);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "StaticMesh", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ItemMeshComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
+	UWidgetComponent* ItemWidgetComponent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
 	EItemType ItemType;
@@ -194,9 +206,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Arrow", EditConditionHides))
 	FArrowInfo ArrowInfo;
-	
-protected:
-	// Called when the game starts or when spawned
+
+	bool bClicked = false;
+private:
 	virtual void BeginPlay() override;
-	
 };

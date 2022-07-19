@@ -35,6 +35,9 @@ void APCGame::PlayerTick(float DeltaTime)
 		if(MyPawn)
 		{
 			FVector WorldDirection = (HitLocation - MyPawn->GetActorLocation()).GetSafeNormal();
+			auto Target = Hit.GetActor();
+			if(Target)
+				Target->NotifyActorOnClicked();
 			MyPawn->AddMovementInput(WorldDirection, 1.f, false);
 		}
 	}
@@ -47,15 +50,10 @@ void APCGame::PlayerTick(float DeltaTime)
 
 void APCGame::SetupInputComponent()
 {
-	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &APCGame::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &APCGame::OnSetDestinationReleased);
-
-	// // support touch devices 
-	// InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &APCGame::OnTouchPressed);
-	// InputComponent->BindTouch(EInputEvent::IE_Released, this, &APCGame::OnTouchReleased);
 
 }
 
@@ -77,32 +75,5 @@ void APCGame::OnSetDestinationPressed()
 
 void APCGame::OnSetDestinationReleased()
 {
-	// Player is no longer pressing the input
 	bInputPressed = false;
-
-	// If it was a short press
-	// if(FollowTime <= ShortPressThreshold)
-	// {
-	// 	// We look for the location in the world where the player has pressed the input
-	// 	FVector HitLocation = FVector::ZeroVector;
-	// 	FHitResult Hit;
-	// 	GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-	// 	HitLocation = Hit.Location;
-	//
-	// 	// We move there and spawn some particles
-	// 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
-	// 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
-	// }
 }
-
-// void APCGame::OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location)
-// {
-// 	bIsTouch = true;
-// 	OnSetDestinationPressed();
-// }
-//
-// void APCGame::OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location)
-// {
-// 	bIsTouch = false;
-// 	OnSetDestinationReleased();
-// }

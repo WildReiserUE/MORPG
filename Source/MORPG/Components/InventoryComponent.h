@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemBase.h"
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
@@ -15,6 +16,8 @@ class MORPG_API UInventoryComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UInventoryComponent();
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	TArray<AItemBase*> InventoryArray;
 
 protected:
 	// Called when the game starts
