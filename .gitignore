@@ -10,7 +10,6 @@ Script
 Plugins
 DerivedDataCache
 Build
-Content/__External*
 /*.ignore
 /tags
 /Makefile

@@ -98,7 +98,7 @@ struct FItemInfo
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int ItemID;
+	int ItemID = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FName ItemName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -106,11 +106,11 @@ struct FItemInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UTexture2D* ItemIcon = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	USoundBase* PickupSound;
+	USoundBase* PickupSound = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UParticleSystem* PickupFX;
+	UParticleSystem* PickupFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UParticleSystem* DropFX;
+	UParticleSystem* DropFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool bIsStackable = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -177,10 +177,10 @@ public:
 	UFUNCTION()
 	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
 
-// #if WITH_EDITOR
-// 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-// 	
-// #endif
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	
+#endif
 	
 	void ChangeSettings();	
 	UFUNCTION()

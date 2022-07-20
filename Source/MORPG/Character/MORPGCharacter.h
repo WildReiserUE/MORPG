@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NavigationInvokerComponent.h"
 #include "GameFramework/Character.h"
 #include "MORPGCharacter.generated.h"
 
@@ -18,17 +19,34 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	/** Returns TopDownCameraComponent subobject **/
-	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
+	FORCEINLINE class UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
 	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE class USpringArmComponent* GetCameraArm() const { return CameraArm; }
 
 private:
-	/** Top down camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* TopDownCameraComponent;
+	virtual void SetupPlayerInputComponent(class UInputComponent* Input) override;
+	void InputAxisX(float Value);
+	void InputAxisY(float Value);
 
-	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+	UCameraComponent* CharacterCameraComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Naviagation, meta = (AllowPrivateAccess = "true"))
+	UNavigationInvokerComponent* Navigation;
+	
+	UFUNCTION()
+		void InputCameraIn();
+	UFUNCTION()
+		void InputCameraOut();
+	void RotateCamera();
+
+	bool bStartRotate = false;
+	float AxisX = 0.0f;
+	float AxisY = 0.0f;
+	float CurrentCharSpeed = 0.0f;
+	float MeshDirection = 0.0f;
 };
 

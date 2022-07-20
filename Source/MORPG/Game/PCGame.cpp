@@ -6,7 +6,6 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "MORPGCharacter.h"
-#include "Engine/World.h"
 
 APCGame::APCGame()
 {
